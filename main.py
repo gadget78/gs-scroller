@@ -96,9 +96,10 @@ def convert_google_sheet(sid, gid):
             "$metatable.resize(); "
         " }" )
     html.find('body').append(script)
-    html.find('&#1F426').append(<img src="https://gadget78.uk/twitter_icon24.png" >)
-    return b'<!DOCTYPE html>\n<meta charset="UTF-8">\n' + \
+    result = b'<!DOCTYPE html>\n<meta charset="UTF-8">\n' + \
         lxml.html.tostring(html, encoding='utf-8')
+    result = result.replace('U+1F426'.encode('utf-8'), b'<img src="https://gadget78.uk/twitter_icon24.png">')
+    return result
 
 SHEET_PATTERN = re.compile(
     r'{[^{}]*'
