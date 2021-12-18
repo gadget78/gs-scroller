@@ -81,7 +81,7 @@ def convert_google_sheet(sid, gid):
         rel='stylesheet', href=url_for('static', filename='metatable.css'),
     ))
     html.find('body').append(lxml.html.Element( 'script',
-        src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"
+        src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"
     ))
     html.find('body').append(lxml.html.Element( 'script',
         src=url_for('static', filename='metatable.js')
@@ -90,9 +90,14 @@ def convert_google_sheet(sid, gid):
     script.text = ( "$(init); "
         "function init() { "
             "$('body').css('overflow', 'hidden'); "
-            "var $table = $('#sheets-viewport table').detach(); "
+            "var $viewport = $('#sheets-viewport').detach(); "
+            "var $table = $viewport.find('table').detach(); "
+            "var $svgs = $viewport.find('svg'); "
             "var $metatable = create_metatable($table); "
-            "$('body').empty().append($metatable); "
+            "$('body').empty(); "
+            "$('body').append($svgs); "
+            "$('body').append($metatable); "
+            "$viewport.remove(); "
             "$metatable.resize(); "
         " }" )
     html.find('body').append(script)
@@ -163,7 +168,7 @@ class GoogleSpreadsheetNotResponding(GoogleSpreadsheetException):
 
 @app.errorhandler(GoogleSpreadsheetNotFound)
 def sheet_not_found(exception):
-    return render_template('google-404.html'), 404
+    return render_template('google-404.html', sid=exception.sid, gid=exception.gid), 404
 
 @app.errorhandler(GoogleSpreadsheetNotResponding)
 def sheet_timeout(exception):
